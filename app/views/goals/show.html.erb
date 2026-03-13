@@ -63,48 +63,7 @@
       </h2>
       
       <div class="space-y-6">
-        <% @goal.milestones.order(order: :asc).each do |milestone| %>
-          <div class="card bg-base-100 shadow-sm border border-base-200 rounded-xl overflow-hidden">
-            <div class="bg-base-200/50 px-6 py-4 flex items-center justify-between border-b border-base-200">
-              <div class="flex items-center gap-3">
-                <span class="badge badge-primary badge-sm font-bold"><%= milestone.order + 1 %></span>
-                <h3 class="font-bold text-lg"><%= milestone.title %></h3>
-              </div>
-              <div class="flex items-center gap-3">
-                <span class="text-sm font-bold text-base-content/60"><%= milestone.progress %>%</span>
-                <progress class="progress progress-primary w-24 h-2" value="<%= milestone.progress %>" max="100"></progress>
-              </div>
-            </div>
-            
-            <div class="p-4 space-y-2">
-              <% if milestone.subtasks.any? %>
-                <% milestone.subtasks.each do |subtask| %>
-                  <div class="flex items-center gap-4 p-3 hover:bg-base-200/30 rounded-lg transition-colors group">
-                    <div class="flex-none">
-                      <% if subtask.completed? %>
-                        <span class="material-symbols-outlined text-success">check_circle</span>
-                      <% else %>
-                        <span class="material-symbols-outlined text-base-content/20">radio_button_unchecked</span>
-                      <% end %>
-                    </div>
-                    <div class="flex-1">
-                      <p class="text-sm font-medium <%= 'line-through text-base-content/40' if subtask.completed? %>">
-                        <%= subtask.title %>
-                      </p>
-                      <% if subtask.completed_at.present? %>
-                        <p class="text-[10px] text-base-content/30 font-bold uppercase tracking-wider">
-                          Done on <%= subtask.completed_at.strftime("%b %d, %H:%M") %>
-                        </p>
-                      <% end %>
-                    </div>
-                  </div>
-                <% end %>
-              <% else %>
-                <p class="text-sm text-base-content/40 italic p-4">No subtasks defined for this milestone.</p>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+        <%= render partial: "goals/milestone", collection: @goal.milestones.order(order: :asc), as: :milestone %>
 
         <% if @goal.milestones.empty? %>
           <div class="text-center p-12 bg-base-200/20 border-2 border-dashed border-base-300 rounded-2xl">
@@ -117,27 +76,7 @@
   </div>
   
   <div class="md:col-span-1 flex flex-col gap-6">
-    <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
-      <div class="card-body p-6">
-        <h2 class="card-title text-xl mb-4 font-black flex items-center gap-2">
-          <span class="material-symbols-outlined text-primary text-[24px]">trending_up</span>
-          Progress
-        </h2>
-        <div class="flex justify-between items-end mb-2">
-          <span class="text-sm text-base-content/60 font-medium">Tracking</span>
-          <span class="text-2xl font-bold"><%= @goal.progress %>%</span>
-        </div>
-        <progress class="progress w-full h-3
-          <%= case @goal.status
-              when 'on_track' then 'progress-success'
-              when 'behind' then 'progress-warning'
-              when 'completed' then 'progress-info'
-              when 'at_risk' then 'progress-error'
-              else 'progress-primary'
-              end
-          %>" value="<%= @goal.progress %>" max="100"></progress>
-      </div>
-    </div>
+    <%= render partial: "goals/progress_card", locals: { goal: @goal } %>
 
     <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
       <div class="card-body p-6">
@@ -149,7 +88,7 @@
         <div class="flex flex-col gap-4">
           <div>
             <span class="text-[10px] text-base-content/50 uppercase font-bold block mb-1">Status</span>
-            <span class="font-medium inline-flex items-center gap-2">
+            <span class="font-medium inline-flex items-center gap-2" id="<%= dom_id @goal %>_status_text">
                <%= @goal.status.titleize %>
             </span>
           </div>

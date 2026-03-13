@@ -1,0 +1,14 @@
+<% milestone = @subtask.milestone %>
+<% goal = milestone.goal %>
+
+<%= turbo_stream.replace milestone do %>
+  <%= render partial: "goals/milestone", locals: { milestone: milestone } %>
+<% end %>
+
+<%= turbo_stream.replace "#{dom_id(goal)}_progress_card" do %>
+  <%= render partial: "goals/progress_card", locals: { goal: goal } %>
+<% end %>
+
+<%= turbo_stream.update "#{dom_id(goal)}_status_text" do %>
+  <%= goal.status.titleize %>
+<% end %>

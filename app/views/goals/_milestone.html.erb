@@ -1,0 +1,29 @@
+<div id="<%= dom_id milestone %>" class="card bg-base-100 shadow-sm border border-base-200 rounded-xl overflow-hidden mb-6">
+  <div class="bg-base-200/50 px-6 py-4 flex items-center justify-between border-b border-base-200">
+    <div class="flex items-center gap-3">
+      <div class="bg-primary text-primary-content rounded-lg p-2 flex items-center justify-center">
+        <span class="material-symbols-outlined text-[18px]">flag</span>
+      </div>
+      <div>
+        <h3 class="font-black text-lg leading-none"><%= milestone.title %></h3>
+        <span class="text-[10px] uppercase font-bold text-base-content/40 tracking-tighter">Milestone <%= milestone.order + 1 %></span>
+      </div>
+    </div>
+    <div class="flex flex-col items-end gap-1">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-black text-primary" id="<%= dom_id milestone %>_progress_text"><%= milestone.progress %>%</span>
+        <progress class="progress progress-primary w-20 h-1.5" value="<%= milestone.progress %>" max="100" id="<%= dom_id milestone %>_progress_bar"></progress>
+      </div>
+    </div>
+  </div>
+  
+  <div class="p-2 space-y-1 bg-base-50/50">
+    <% if milestone.subtasks.any? %>
+      <div class="pl-4 border-l-2 border-base-200 ml-4 my-2">
+        <%= render partial: "goals/subtask", collection: milestone.subtasks.order(created_at: :asc), as: :subtask %>
+      </div>
+    <% else %>
+      <p class="text-sm text-base-content/40 italic p-4">No subtasks defined for this milestone.</p>
+    <% end %>
+  </div>
+</div>

@@ -13,7 +13,7 @@ RSpec.describe "Authentication", type: :system do
     click_button "Sign up"
 
     expect(page).to have_content("Welcome! You have signed up successfully.")
-    expect(page).to have_link("Logout")
+    expect(page).to have_link("Sair")
   end
 
   it "allows a user to sign in" do
@@ -25,6 +25,6 @@ RSpec.describe "Authentication", type: :system do
     click_button "Log in"
 
     expect(page).to have_content("Signed in successfully.")
-    expect(page).to have_link("Logout")
+    expect(page).to have_link("Sair")
   end
 end

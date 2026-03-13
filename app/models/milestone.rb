@@ -6,8 +6,10 @@ class Milestone < ApplicationRecord
   validates :title, :order, presence: true
 
   def progress
-    return 0 if subtasks.empty?
+    total_subtasks = subtasks.size
+    return 0 if total_subtasks.zero?
 
-    (subtasks.where(completed: true).count.to_f / subtasks.count * 100).round
+    completed_subtasks = subtasks.select(&:completed?).size
+    (completed_subtasks.to_f / total_subtasks * 100).round
   end
 end

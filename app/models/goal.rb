@@ -9,16 +9,17 @@ class Goal < ApplicationRecord
   validates :title, :category, :status, presence: true
 
   def progress
-    return 0 if milestones.empty?
+    total_milestones = milestones.size
+    return 0 if total_milestones.zero?
 
-    (milestones.sum(&:progress).to_f / milestones.count).round
+    (milestones.sum(&:progress).to_f / total_milestones).round
   end
 
-  after_initialize :set_defaults, if: :new_record?
+  before_save :update_status_if_completed
 
   private
 
-  def set_defaults
-    # No dynamic defaults for now
+  def update_status_if_completed
+    self.status = :completed if progress == 100
   end
 end

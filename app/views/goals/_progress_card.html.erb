@@ -1,0 +1,21 @@
+<div id="<%= dom_id goal %>_progress_card" class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
+  <div class="card-body p-6">
+    <h2 class="card-title text-xl mb-4 font-black flex items-center gap-2">
+      <span class="material-symbols-outlined text-primary text-[24px]">trending_up</span>
+      Progress
+    </h2>
+    <div class="flex justify-between items-end mb-2">
+      <span class="text-sm text-base-content/60 font-medium">Tracking</span>
+      <span class="text-2xl font-bold" id="<%= dom_id goal %>_progress_text"><%= goal.progress %>%</span>
+    </div>
+    <progress class="progress w-full h-3
+      <%= case goal.status
+          when 'on_track' then 'progress-success'
+          when 'behind' then 'progress-warning'
+          when 'completed' then 'progress-info'
+          when 'at_risk' then 'progress-error'
+          else 'progress-primary'
+          end
+      %>" value="<%= goal.progress %>" max="100" id="<%= dom_id goal %>_progress_bar"></progress>
+  </div>
+</div>
