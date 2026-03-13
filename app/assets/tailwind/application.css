@@ -1,2 +1,5 @@
-@import "https://cdn.jsdelivr.net/npm/daisyui@5.0.0-beta.6/index.css";
 @import "tailwindcss";
+
+@source not "./daisyui{,*}.mjs";
+@plugin "./daisyui.mjs";
+@plugin "./daisyui-theme.mjs";
