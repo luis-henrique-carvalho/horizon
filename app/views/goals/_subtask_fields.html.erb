@@ -1,0 +1,15 @@
+<div class="nested-fields flex items-center gap-3 p-3 bg-base-100/50 border border-base-200 rounded-lg group" data-new-record="<%= f.object.new_record? %>">
+  <%= f.hidden_field :_destroy %>
+  
+  <div class="form-control">
+    <%= f.check_box :completed, class: "checkbox checkbox-sm checkbox-primary rounded border-base-300 bg-base-100" %>
+  </div>
+  
+  <div class="flex-1">
+    <%= f.text_field :title, placeholder: "Subtask Name", class: "input input-ghost w-full p-0 h-auto min-h-0 text-sm text-base-content/80 focus:text-base-content focus:bg-transparent border-none focus:outline-none focus:ring-0" %>
+  </div>
+  
+  <button type="button" data-action="nested-form#remove" class="btn btn-ghost btn-xs opacity-0 group-hover:opacity-100 text-base-content/40 hover:text-error transition-all">
+    <span class="material-symbols-outlined text-sm">delete</span>
+  </button>
+</div>

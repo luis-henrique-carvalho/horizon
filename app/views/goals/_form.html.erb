@@ -12,46 +12,73 @@
     </div>
   <% end %>
 
-  <div class="form-control w-full">
-    <%= form.label :title, class: "label font-bold" %>
-    <%= form.text_field :title, class: "input input-bordered w-full", placeholder: "E.g., Launch new marketing campaign" %>
+  <!-- Main Info Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="col-span-2 form-control">
+      <%= form.label :title, "Goal Title", class: "label text-xs font-bold text-base-content/60 uppercase tracking-wider" %>
+      <%= form.text_field :title, class: "input input-bordered w-full bg-base-200/50 focus:ring-2 focus:ring-primary transition-all outline-none border-base-300", placeholder: "e.g. Run a Marathon" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :category, class: "label text-xs font-bold text-base-content/60 uppercase tracking-wider" %>
+      <%= form.select :category, Goal.categories.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full bg-base-200/50 outline-none border-base-300" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :status, class: "label text-xs font-bold text-base-content/60 uppercase tracking-wider" %>
+      <%= form.select :status, Goal.statuses.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full bg-base-200/50 outline-none border-base-300" %>
+    </div>
+
+    <div class="form-control">
+      <%= form.label :deadline, "Target End Date", class: "label text-xs font-bold text-base-content/60 uppercase tracking-wider" %>
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-base-content/50 text-sm">event</span>
+        <%= form.date_field :deadline, class: "input input-bordered w-full pl-10 bg-base-200/50 outline-none border-base-300" %>
+      </div>
+    </div>
+
+    <div class="col-span-2 form-control">
+      <%= form.label :description, class: "label text-xs font-bold text-base-content/60 uppercase tracking-wider" %>
+      <%= form.text_area :description, class: "textarea textarea-bordered w-full bg-base-200/50 outline-none resize-none border-base-300", placeholder: "Explain why this goal is important...", rows: 3 %>
+    </div>
   </div>
 
-  <div class="form-control w-full">
-    <%= form.label :category, class: "label font-bold" %>
-    <%= form.select :category, Goal.categories.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full" %>
+  <!-- Milestones Section -->
+  <div data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-fields">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Key Milestones</h3>
+      <button type="button" data-action="nested-form#add" class="btn btn-ghost btn-xs text-primary flex items-center gap-1 hover:bg-primary/10">
+        <span class="material-symbols-outlined text-sm">add_circle</span> Add Milestone
+      </button>
+    </div>
+
+    <div data-nested-form-target="container" class="space-y-4">
+      <%= form.fields_for :milestones do |m_form| %>
+        <%= render "milestone_fields", f: m_form %>
+      <% end %>
+    </div>
+
+    <template data-nested-form-target="template">
+      <%= form.fields_for :milestones, Milestone.new, child_index: "NEW_RECORD" do |m_form| %>
+        <%= render "milestone_fields", f: m_form %>
+      <% end %>
+    </template>
   </div>
 
-  <div class="form-control w-full">
-    <%= form.label :status, class: "label font-bold" %>
-    <%= form.select :status, Goal.statuses.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full" %>
-  </div>
-
-  <div class="form-control w-full">
-    <label class="label font-bold">
-      <%= form.label :progress %>
-      <span class="label-text-alt" id="progressValue"><%= goal.progress || 0 %>%</span>
-    </label>
-    <%= form.range_field :progress, in: 0..100, class: "range range-primary", step: 1, oninput: "document.getElementById('progressValue').innerText = this.value + '%'" %>
-  </div>
-
-  <div class="form-control w-full">
-    <%= form.label :deadline, class: "label font-bold" %>
-    <%= form.date_field :deadline, class: "input input-bordered w-full" %>
-  </div>
-
-  <div class="form-control w-full">
-    <%= form.label :description, class: "label font-bold" %>
-    <%= form.text_area :description, class: "textarea textarea-bordered h-24", placeholder: "Detailed description of the goal..." %>
-  </div>
-
-  <div class="flex justify-end gap-3 mt-4 pt-4 border-t border-base-200">
-    <%= link_to goals_path, class: "btn btn-ghost text-base-content/70 hover:text-base-content font-bold" do %>
+  <!-- Modal Footer -->
+  <div class="flex items-center justify-between mt-8 pt-6 border-t border-base-300">
+    <%= link_to goals_path, class: "btn btn-ghost font-bold text-sm" do %>
       Cancel
     <% end %>
-    <%= button_tag type: 'submit', class: "btn btn-primary font-bold shadow-lg shadow-primary/20" do %>
-      <span class="material-symbols-outlined text-[20px]">save</span>
-      Save Goal
-    <% end %>
+    <div class="flex gap-3">
+      <% if goal.persisted? %>
+        <%= link_to goal_path(goal), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" }, class: "btn btn-outline btn-error font-bold text-sm" do %>
+          Delete Goal
+        <% end %>
+      <% end %>
+      <%= form.button class: "btn btn-primary px-8 font-bold text-sm shadow-lg shadow-primary/20 hover:brightness-110 active:scale-95 transition-all" do %>
+        Save Goal
+      <% end %>
+    </div>
   </div>
 <% end %>

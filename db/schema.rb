@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_13_172350) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_13_183428) do
   create_table "goals", force: :cascade do |t|
     t.integer "category"
     t.datetime "created_at", null: false
@@ -22,6 +22,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_172350) do
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
     t.index ["user_id"], name: "index_goals_on_user_id"
+  end
+
+  create_table "milestones", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "goal_id", null: false
+    t.integer "order"
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["goal_id"], name: "index_milestones_on_goal_id"
+  end
+
+  create_table "subtasks", force: :cascade do |t|
+    t.boolean "completed", default: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "milestone_id", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.index ["milestone_id"], name: "index_subtasks_on_milestone_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -37,4 +56,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_13_172350) do
   end
 
   add_foreign_key "goals", "users"
+  add_foreign_key "milestones", "goals"
+  add_foreign_key "subtasks", "milestones"
 end

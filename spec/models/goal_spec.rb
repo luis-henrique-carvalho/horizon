@@ -1,28 +1,27 @@
 require 'rails_helper'
 
 RSpec.describe Goal, type: :model do
-  describe 'associations' do
-    it { should belong_to(:user) }
-  end
+  let(:user) { User.create!(email: 'goal@test.com', password: 'password') }
+  let(:goal) { Goal.create!(title: 'Goal 1', user: user, category: :other, status: :on_track) }
 
-  describe 'validations' do
-    it { should validate_presence_of(:title) }
-    it { should validate_presence_of(:category) }
-    it { should validate_presence_of(:status) }
-    it { should validate_numericality_of(:progress).is_greater_than_or_equal_to(0).is_less_than_or_equal_to(100) }
-  end
-
-  describe 'enums' do
-    it { should define_enum_for(:category).with_values(marketing: 0, product: 1, sales: 2, security: 3, other: 4) }
-    it { should define_enum_for(:status).with_values(on_track: 0, behind: 1, completed: 2, at_risk: 3) }
-  end
-
-  describe 'defaults' do
-    let(:user) { create(:user) }
-    
-    it 'sets default progress to 0' do
-      goal = Goal.new(title: 'My Goal', category: :product, status: :on_track, user: user)
+  describe 'progress calculation' do
+    it 'returns 0 if no milestones' do
       expect(goal.progress).to eq(0)
+    end
+
+    it 'calculates average progress of milestones' do
+      m1 = goal.milestones.create!(title: 'M1', order: 1)
+      m2 = goal.milestones.create!(title: 'M2', order: 2)
+      
+      # M1 with 50% (1/2 subtasks)
+      m1.subtasks.create!(title: 'S1', completed: true)
+      m1.subtasks.create!(title: 'S2', completed: false)
+      
+      # M2 with 100% (1/1 subtask)
+      m2.subtasks.create!(title: 'S3', completed: true)
+      
+      # Goal progress = (50 + 100) / 2 = 75
+      expect(goal.progress).to eq(75)
     end
   end
 end

@@ -42,10 +42,16 @@ class GoalsController < ApplicationController
   private
 
   def set_goal
-    @goal = current_user.goals.find(params[:id])
+    @goal = current_user.goals.includes(milestones: :subtasks).find(params[:id])
   end
 
   def goal_params
-    params.require(:goal).permit(:title, :description, :category, :status, :progress, :deadline)
+    params.require(:goal).permit(
+      :title, :description, :category, :status, :progress, :deadline,
+      milestones_attributes: [
+        :id, :title, :order, :_destroy,
+        subtasks_attributes: [:id, :title, :completed, :_destroy]
+      ]
+    )
   end
 end
