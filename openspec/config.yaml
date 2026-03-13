@@ -1,0 +1,41 @@
+schema: spec-driven
+
+context: |
+  # Arquitetura e Stack
+  - Framework: Ruby on Rails (Monólito). Sem APIs separadas ou SPAs a menos que explicitamente solicitado.
+  - Frontend: Importmaps (ou esbuild) + Tailwind CSS + DaisyUI.
+  - Autenticação: Devise.
+  - Base de Dados: PostgreSQL (ou SQLite, dependendo do projeto).
+  - Testes: RSpec, Capybara, FactoryBot.
+
+  # Regras de Ouro (A Filosofia "Frank")
+  - Zero Adivinhação (YAGNI): Implementa APENAS o que foi pedido. Não antecipar funcionalidades ou adicionar código supérfluo.
+  - Extreme Programming (TDD): A regra é Red, Green, Refactor. O primeiro output DEVE ser o teste RSpec a falhar. Escrever a implementação de produção só a seguir.
+  - Baby Steps: Trabalhar em ciclos curtos. Um model e teste, de seguida um controller e teste, e só depois views.
+  - Respostas Concisas: Apenas o código e diffs necessários sem textos de encher.
+
+  # Frontend e Views
+  - Usa a semântica do DaisyUI sempre que possível, sem "utility soup" descabido do Tailwind.
+  - Views generadas via Devise devem passar a usar as diretrizes do DaisyUI.
+
+  # Segurança, Devise e Pundit
+  - Bloqueio Ativado: before_action :authenticate_user! no ApplicationController, exceptions controladas.
+  - Roteamento REST: Mante as rotas simples e dentro do padrão Devise/Rails.
+  - O uso de ifs na view para controlo de acesso por perfis é evitado e substituído por Pundit.
+
+  # Boas Práticas (Rails Way)
+  - Prevenir N+1 Queries: usar includes ou strict_loading nos controllers.
+  - Fat Models / Skinny Controllers ou Service Objects: Reduzir controllers ao mínimo de linhas, lógicas elaboradas passam para app/services/.
+  - Background Jobs: Sidekiq ou Solid Queue para envio de correio local, processar ficheiros e conectar APIs.
+
+  # Comandos Úteis
+  $ bundle exec rspec
+  $ bundle exec rubocop -A
+
+rules:
+  tasks:
+    - O primeiro step de cada tarefa deve começar sempre pelo RSpec (ex: definir testes a falhar).
+    - Tarefas devem ser partidas nos conceitos da filosofia Baby Steps.
+    - Antes de adicionar novas gems, deve-se verificar a documentação oficial para garantir compatibilidade com a stack (Rails 8, Solid Stack, SQLite).
+  explore:
+    - Evitar generalizações e aderir estritamente à framework Ruby on Rails + DaisyUI sem recomendar bibliotecas externas que fujam da stack estabelecida.
