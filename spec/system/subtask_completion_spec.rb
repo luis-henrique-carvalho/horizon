@@ -16,39 +16,42 @@ RSpec.describe "Subtask Completion", type: :system do
     visit goal_path(goal)
 
     expect(page).to have_content("Turbo Streams")
-    expect(page).to have_content("0%") # Initial milestone progress
+
+    # Milestone has 2 subtasks now (Turbo Streams + Default Subtask)
+    expect(page).to have_content("0%")
 
     within "##{dom_id(subtask)}" do
       check "subtask_#{subtask.id}_completed"
       click_button "Update"
     end
 
-    expect(page).to have_content("100%")
+    expect(page).to have_content("50%")
     expect(subtask.reload.completed).to be true
     expect(subtask.completed_at).to be_present
   end
 
   it "updates milestone and goal progress when multiple subtasks are completed" do
-    create(:subtask, milestone: milestone, title: "Second Task", completed: false)
+    # Já temos a subtask "Turbo Streams" e a "Default Subtask"
     visit goal_path(goal)
 
     expect(page).to have_content("0%")
 
-    within "##{dom_id(Subtask.first)}" do
-      check "subtask_#{Subtask.first.id}_completed"
+    within "##{dom_id(subtask)}" do
+      check "subtask_#{subtask.id}_completed"
       click_button "Update"
     end
     expect(page).to have_content("50%")
 
-    within "##{dom_id(Subtask.last)}" do
-      check "subtask_#{Subtask.last.id}_completed"
+    within "##{dom_id(milestone.subtasks.find_by(title: "Default Subtask"))}" do
+      check "subtask_#{milestone.subtasks.find_by(title: "Default Subtask").id}_completed"
       click_button "Update"
     end
     expect(page).to have_content("100%")
   end
 
   it "allows uncompleting a subtask and resets progress" do
-    subtask.update!(completed: true)
+    # Completar todas as subtasks (2 no total)
+    milestone.subtasks.update_all(completed: true)
     visit goal_path(goal)
 
     expect(page).to have_content("100%")
@@ -58,7 +61,7 @@ RSpec.describe "Subtask Completion", type: :system do
       click_button "Update"
     end
 
-    expect(page).to have_content("0%")
+    expect(page).to have_content("50%")
     expect(subtask.reload.completed).to be false
     expect(subtask.completed_at).to be_nil
   end
@@ -68,9 +71,15 @@ RSpec.describe "Subtask Completion", type: :system do
 
     expect(page).to have_content("On Track")
 
-    within "##{dom_id(subtask)}" do
-      check "subtask_#{subtask.id}_completed"
-      click_button "Update"
+    # Marcar todas as subtasks visíveis
+    # No rack_test, cada submissão de formulário recarrega a página.
+    # Vamos pegar os IDs das checkboxes no início e iterar.
+    checkbox_ids = all('input[type="checkbox"]').map { |c| c[:id] }
+
+    checkbox_ids.each do |id|
+      # Re-visitar se necessário ou apenas checar se o estado mudou
+      check id
+      find("##{id}").find(:xpath, "./ancestor::form").find('input[type="submit"]', visible: false).click
     end
 
     expect(page).to have_content("Completed")
@@ -78,21 +87,27 @@ RSpec.describe "Subtask Completion", type: :system do
   end
 
   it "calculates progress correctly across multiple milestones" do
-    m2 = create(:milestone, goal: goal, title: "Advanced", order: 1)
-    create(:subtask, milestone: m2, title: "Turbo Frames", completed: false)
+    m2 = build(:milestone, goal: goal, title: "Advanced", order: 1)
+    m2.subtasks = [ build(:subtask, milestone: m2, title: "Turbo Frames", completed: false) ]
+    m2.save!
 
     visit goal_path(goal)
 
-    # Milestone 1: 0%, Milestone 2: 0%, Goal Progress: 0%
-    # Complete subtask in Milestone 1
-    within "##{dom_id(subtask)}" do
-      check "subtask_#{subtask.id}_completed"
-      click_button "Update"
+    # Pegar as subtasks do primeiro milestone apenas
+    within "##{dom_id(milestone)}" do
+      ids = all('input[type="checkbox"]').map { |c| c[:id] }
+      ids.each do |id|
+        check id
+        find("##{id}").find(:xpath, "./ancestor::form").find('input[type="submit"]', visible: false).click
+      end
     end
 
-    # Milestone 1 should be 100%, Milestone 2 should be 0%, Goal should be 50%
-    expect(page).to have_content("100%")
-    # The overall progress card should show 50%
+    # Milestone 1 should be 100%
+    within "##{dom_id(milestone)}" do
+      expect(page).to have_content("100%")
+    end
+
+    # Milestone 2: 0% progress. Goal average: (100 + 0) / 2 = 50%
     within ".card", text: "Progress" do
       expect(page).to have_content("50%")
     end

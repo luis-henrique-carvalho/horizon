@@ -10,10 +10,11 @@ RSpec.describe Subtask, type: :model do
   end
 
   describe 'completion logic' do
-    let(:user) { User.create!(email: 'test@example.com', password: 'password') }
-    let(:goal) { Goal.create!(title: 'G1', user: user, category: :other, status: :on_track) }
-    let(:milestone) { Milestone.create!(title: 'M1', order: 1, goal: goal) }
-    let(:subtask) { Subtask.create!(title: 'Task 1', milestone: milestone) }
+    let(:user) { create(:user) }
+    let(:goal) { create(:goal, user: user) }
+    # FactoryBot already handles milestone with subtask
+    let(:milestone) { create(:milestone, goal: goal) }
+    let(:subtask) { milestone.subtasks.first }
 
     it 'is not completed by default' do
       expect(subtask.completed).to be_falsey

@@ -108,11 +108,12 @@ RSpec.describe "Goals", type: :system do
 
   it "shows errors when subtask title is missing" do
     goal = create(:goal, user: user)
+    # create(:milestone) já cria uma subtask "Default Subtask"
     milestone = create(:milestone, goal: goal)
-    create(:subtask, milestone: milestone, title: "Initial Task")
 
     visit edit_goal_path(goal)
-    fill_in with: "", placeholder: "Subtask Name"
+    # Usar 'first' para evitar ambiguidade se houver múltiplas subtasks
+    first(:field, placeholder: "Subtask Name").set("")
     click_on "Save Goal"
 
     expect(page).to have_content("Milestones subtasks title can't be blank")
@@ -120,11 +121,16 @@ RSpec.describe "Goals", type: :system do
 
   it "updates goal progress correctly when subtasks are completed" do
     goal = create(:goal, user: user)
-    milestone = create(:milestone, goal: goal)
-    create(:subtask, milestone: milestone, completed: true)
-    create(:subtask, milestone: milestone, completed: false)
+    # Criar milestone sem a subtask padrão para ter controle total
+    milestone = build(:milestone, goal: goal)
+    milestone.subtasks = [
+      build(:subtask, milestone: milestone, completed: true),
+      build(:subtask, milestone: milestone, completed: false)
+    ]
+    milestone.save!
 
     visit goal_path(goal)
+    # Procurar o progresso especificamente no card de progresso ou no milestone
     expect(page).to have_content("50%")
   end
 
@@ -143,11 +149,16 @@ RSpec.describe "Goals", type: :system do
 
   it "allows updating a subtask title" do
     goal = create(:goal, user: user)
-    milestone = create(:milestone, goal: goal)
-    subtask = create(:subtask, milestone: milestone, title: "Old Title")
+    milestone = build(:milestone, goal: goal)
+    subtask = build(:subtask, milestone: milestone, title: "Old Title")
+    milestone.subtasks = [ subtask ]
+    milestone.save!
 
     visit edit_goal_path(goal)
-    fill_in with: "New Title", placeholder: "Subtask Name"
+    # Usar 'within' ou ser mais específico para evitar ambiguidade se houver outras subtasks
+    within ".subtask-section" do
+      fill_in with: "New Title", placeholder: "Subtask Name"
+    end
     click_on "Save Goal"
 
     expect(subtask.reload.title).to eq("New Title")

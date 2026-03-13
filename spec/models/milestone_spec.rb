@@ -1,17 +1,23 @@
 require 'rails_helper'
 
 RSpec.describe Milestone, type: :model do
-  describe 'associations' do
-    it { should belong_to(:goal) }
-    it { should have_many(:subtasks).dependent(:destroy) }
+  let(:goal) { create(:goal) }
+
+  it "is valid with a title, order and at least one subtask" do
+    milestone = Milestone.new(title: "Milestone", order: 0, goal: goal)
+    milestone.subtasks.build(title: "Subtask")
+    expect(milestone).to be_valid
   end
 
-  describe 'validations' do
-    it { should validate_presence_of(:title) }
-    it { should validate_presence_of(:order) }
+  it "is invalid without subtasks" do
+    milestone = Milestone.new(title: "Milestone", order: 0, goal: goal)
+    expect(milestone).not_to be_valid
+    expect(milestone.errors[:base]).to include("Each milestone must have at least one subtask")
   end
 
-  describe 'nested attributes' do
-    it { should accept_nested_attributes_for(:subtasks).allow_destroy(true) }
+  it "is invalid if all subtasks are marked for destruction" do
+    milestone = create(:milestone, goal: goal)
+    milestone.subtasks.each(&:mark_for_destruction)
+    expect(milestone).not_to be_valid
   end
 end

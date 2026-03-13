@@ -10,16 +10,18 @@ RSpec.describe Goal, type: :model do
     end
 
     it 'calculates average progress of milestones' do
-      m1 = goal.milestones.create!(title: 'M1', order: 1)
-      m2 = goal.milestones.create!(title: 'M2', order: 2)
+      # Create milestones with subtasks using nested attributes or manual build to satisfy validation
+      m1 = goal.milestones.build(title: 'M1', order: 1)
+      m1.subtasks.build(title: 'S1', completed: true)
+      m1.subtasks.build(title: 'S2', completed: false)
+      m1.save!
+
+      m2 = goal.milestones.build(title: 'M2', order: 2)
+      m2.subtasks.build(title: 'S3', completed: true)
+      m2.save!
 
       # M1 with 50% (1/2 subtasks)
-      m1.subtasks.create!(title: 'S1', completed: true)
-      m1.subtasks.create!(title: 'S2', completed: false)
-
       # M2 with 100% (1/1 subtask)
-      m2.subtasks.create!(title: 'S3', completed: true)
-
       # Goal progress = (50 + 100) / 2 = 75
       expect(goal.progress).to eq(75)
     end

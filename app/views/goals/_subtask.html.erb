@@ -1,8 +1,8 @@
-<div id="<%= dom_id subtask %>" class="flex items-center gap-4 p-3 hover:bg-base-200/30 rounded-lg transition-colors group">
+<div id="<%= dom_id subtask %>" class="flex items-center gap-4 p-3 mb-4 hover:bg-base-200/30 rounded-lg transition-colors group">
   <div class="flex-none">
     <%= form_with(model: subtask, url: subtask_path(subtask), method: :patch, data: { turbo_frame: "_top" }) do |f| %>
-      <%= f.check_box :completed, 
-          class: "checkbox checkbox-primary checkbox-sm", 
+      <%= f.check_box :completed,
+          class: "checkbox checkbox-primary checkbox-sm",
           onchange: "this.form.requestSubmit()",
           id: "subtask_#{subtask.id}_completed" %>
       <%= f.submit "Update", class: "hidden" %>
