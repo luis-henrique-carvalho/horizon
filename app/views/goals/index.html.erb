@@ -14,27 +14,60 @@
 <div class="flex flex-col gap-6 mb-8">
   <div class="flex items-center justify-between border-b border-base-200">
     <div class="tabs tabs-bordered">
-      <a class="tab tab-active text-primary font-bold">Active Goals (<%= @goals.count %>)</a>
-      <a class="tab text-base-content/60 font-medium hover:text-base-content transition-colors">Archived (0)</a>
+      <%= link_to goals_path(request.query_parameters.merge(tab: 'active')), 
+                  class: "tab #{params[:tab] != 'archived' ? 'tab-active text-primary font-bold' : 'text-base-content/60 font-medium'}" do %>
+        Active Goals (<%= current_user.goals.active.count %>)
+      <% end %>
+      <%= link_to goals_path(request.query_parameters.merge(tab: 'archived')), 
+                  class: "tab #{params[:tab] == 'archived' ? 'tab-active text-primary font-bold' : 'text-base-content/60 font-medium'}" do %>
+        Archived (<%= current_user.goals.archived.count %>)
+      <% end %>
     </div>
   </div>
-  <div class="flex flex-wrap items-center gap-3">
-    <div class="flex items-center gap-2 px-3 py-2 bg-base-100 border border-base-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
-      <span class="material-symbols-outlined text-primary text-[20px]">category</span>
-      <span class="text-sm font-medium">Category: All</span>
-      <span class="material-symbols-outlined text-base-content/40 text-[18px]">expand_more</span>
+
+  <%= form_with url: goals_path, method: :get, class: "flex flex-wrap items-center gap-4" do |f| %>
+    <%= f.hidden_field :tab, value: params[:tab] %>
+    
+    <div class="form-control">
+      <div class="input-group">
+        <span class="bg-base-100 border-r-0 border-base-200 px-3 flex items-center">
+          <span class="material-symbols-outlined text-primary text-[20px]">category</span>
+        </span>
+        <%= f.select :category, 
+                     Goal.categories.keys.map { |c| [c.titleize, c] }, 
+                     { include_blank: "All Categories", selected: params[:category] },
+                     { name: "category", class: "select select-bordered select-sm focus:outline-none", onchange: "this.form.submit()" } %>
+      </div>
     </div>
-    <div class="flex items-center gap-2 px-3 py-2 bg-base-100 border border-base-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
-      <span class="material-symbols-outlined text-primary text-[20px]">event</span>
-      <span class="text-sm font-medium">Deadline: Soonest</span>
-      <span class="material-symbols-outlined text-base-content/40 text-[18px]">expand_more</span>
+
+    <div class="form-control">
+      <div class="input-group">
+        <span class="bg-base-100 border-r-0 border-base-200 px-3 flex items-center">
+          <span class="material-symbols-outlined text-primary text-[20px]">sort</span>
+        </span>
+        <%= f.select :sort, 
+                     [
+                       ["Deadline: Soonest", "deadline_soon"],
+                       ["Deadline: Furthest", "deadline_far"],
+                       ["Progress: High to Low", "progress_high"],
+                       ["Progress: Low to High", "progress_low"]
+                     ], 
+                     { selected: params[:sort] || "deadline_soon" },
+                     { name: "sort", class: "select select-bordered select-sm focus:outline-none", onchange: "this.form.submit()" } %>
+      </div>
     </div>
-    <div class="flex items-center gap-2 px-3 py-2 bg-base-100 border border-base-200 rounded-lg cursor-pointer hover:border-primary transition-colors">
-      <span class="material-symbols-outlined text-primary text-[20px]">trending_up</span>
-      <span class="text-sm font-medium">Progress: High to Low</span>
-      <span class="material-symbols-outlined text-base-content/40 text-[18px]">expand_more</span>
-    </div>
-  </div>
+
+    <%= f.button type: :submit, name: nil, class: "btn btn-sm btn-primary btn-square", id: "apply-filters" do %>
+      <span class="material-symbols-outlined">filter_list</span>
+    <% end %>
+
+    <% if params[:category].present? || params[:sort].present? %>
+      <%= link_to goals_path(tab: params[:tab]), class: "btn btn-sm btn-ghost text-error gap-1" do %>
+        <span class="material-symbols-outlined text-[18px]">close</span>
+        Clear
+      <% end %>
+    <% end %>
+  <% end %>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

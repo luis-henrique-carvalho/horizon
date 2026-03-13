@@ -3,7 +3,9 @@ class GoalsController < ApplicationController
   before_action :set_goal, only: %i[show edit update destroy]
 
   def index
-    @goals = current_user.goals.order(deadline: :asc)
+    @goals = current_user.goals
+    @goals = apply_filters(@goals)
+    @goals = apply_sorting(@goals)
   end
 
   def show
@@ -43,6 +45,33 @@ class GoalsController < ApplicationController
 
   def set_goal
     @goal = current_user.goals.includes(milestones: :subtasks).find(params[:id])
+  end
+
+  def apply_filters(relation)
+    case params[:tab]
+    when "archived"
+      relation = relation.archived
+    else
+      relation = relation.active
+    end
+
+    relation = relation.by_category(params[:category]) if params[:category].present?
+    relation
+  end
+
+  def apply_sorting(relation)
+    case params[:sort]
+    when "progress_high"
+      relation.order_by_progress(:desc)
+    when "progress_low"
+      relation.order_by_progress(:asc)
+    when "deadline_soon"
+      relation.order_by_deadline(:asc)
+    when "deadline_far"
+      relation.order_by_deadline(:desc)
+    else
+      relation.order_by_deadline(:asc)
+    end
   end
 
   def goal_params
