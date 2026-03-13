@@ -1,0 +1,35 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:80"
+    volumes:
+      - ./storage:/rails/storage
+    env_file:
+      - .env
+    environment:
+      - RAILS_ENV=production
+    depends_on:
+      - db_prepare
+
+  queue:
+    build: .
+    command: ./bin/jobs
+    volumes:
+      - ./storage:/rails/storage
+    env_file:
+      - .env
+    environment:
+      - RAILS_ENV=production
+    depends_on:
+      - db_prepare
+
+  db_prepare:
+    build: .
+    command: ./bin/rails db:prepare
+    volumes:
+      - ./storage:/rails/storage
+    env_file:
+      - .env
+    environment:
+      - RAILS_ENV=production
