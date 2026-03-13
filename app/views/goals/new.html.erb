@@ -1,0 +1,18 @@
+<div class="mb-8">
+  <div class="text-sm breadcrumbs">
+    <ul>
+      <li><%= link_to "Home", root_path %></li>
+      <li><%= link_to "Goals", goals_path %></li>
+      <li>Create Goal</li>
+    </ul>
+  </div>
+
+  <h1 class="text-3xl font-bold mt-4">New Goal</h1>
+  <p class="text-base-content/70 mt-2">Define a new strategic objective and track its progress.</p>
+</div>
+
+<div class="card bg-base-100 shadow-xl border border-base-200 max-w-3xl">
+  <div class="card-body">
+    <%= render "form", goal: @goal %>
+  </div>
+</div>

@@ -1,0 +1,52 @@
+<%= form_with(model: goal, class: "flex flex-col gap-6") do |form| %>
+  <% if goal.errors.any? %>
+    <div class="alert alert-error">
+      <div>
+        <h3 class="font-bold"><%= pluralize(goal.errors.count, "error") %> prohibited this goal from being saved:</h3>
+        <ul>
+          <% goal.errors.each do |error| %>
+            <li><%= error.full_message %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="form-control w-full">
+    <%= form.label :title, class: "label font-bold" %>
+    <%= form.text_field :title, class: "input input-bordered w-full", placeholder: "E.g., Launch new marketing campaign" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= form.label :category, class: "label font-bold" %>
+    <%= form.select :category, Goal.categories.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= form.label :status, class: "label font-bold" %>
+    <%= form.select :status, Goal.statuses.keys.map { |k| [k.titleize, k] }, {}, class: "select select-bordered w-full" %>
+  </div>
+
+  <div class="form-control w-full">
+    <label class="label font-bold">
+      <%= form.label :progress %>
+      <span class="label-text-alt" id="progressValue"><%= goal.progress || 0 %>%</span>
+    </label>
+    <%= form.range_field :progress, in: 0..100, class: "range range-primary", step: 1, oninput: "document.getElementById('progressValue').innerText = this.value + '%'" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= form.label :deadline, class: "label font-bold" %>
+    <%= form.date_field :deadline, class: "input input-bordered w-full" %>
+  </div>
+
+  <div class="form-control w-full">
+    <%= form.label :description, class: "label font-bold" %>
+    <%= form.text_area :description, class: "textarea textarea-bordered h-24", placeholder: "Detailed description of the goal..." %>
+  </div>
+
+  <div class="flex gap-4 mt-4">
+    <%= form.submit class: "btn btn-primary" %>
+    <%= link_to "Cancel", goals_path, class: "btn btn-ghost" %>
+  </div>
+<% end %>
