@@ -47,6 +47,19 @@ RSpec.describe Goal, type: :model do
       end
     end
 
+    describe '.search' do
+      it 'filters goals by title' do
+        expect(Goal.search('Active')).to include(active_goal)
+        expect(Goal.search('Active')).not_to include(behind_goal)
+      end
+
+      it 'filters goals by description' do
+        active_goal.update!(description: 'This is a description')
+        expect(Goal.search('description')).to include(active_goal)
+        expect(Goal.search('description')).not_to include(behind_goal)
+      end
+    end
+
     describe '.active' do
       it 'includes goals that are not completed' do
         expect(Goal.active).to include(active_goal, behind_goal, at_risk_goal)

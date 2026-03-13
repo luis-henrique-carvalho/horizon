@@ -56,6 +56,7 @@ class GoalsController < ApplicationController
     end
 
     relation = relation.by_category(params[:category]) if params[:category].present?
+    relation = relation.search(params[:query]) if params[:query].present?
     relation
   end
 

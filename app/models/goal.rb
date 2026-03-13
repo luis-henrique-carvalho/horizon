@@ -10,6 +10,7 @@ class Goal < ApplicationRecord
 
   scope :by_status, ->(status) { where(status: status) if status.present? }
   scope :by_category, ->(category) { where(category: category) if category.present? }
+  scope :search, ->(query) { where("LOWER(title) LIKE ? OR LOWER(description) LIKE ?", "%#{query.downcase}%", "%#{query.downcase}%") if query.present? }
   scope :active, -> { where.not(status: :completed) }
   scope :archived, -> { where(status: :completed) }
 

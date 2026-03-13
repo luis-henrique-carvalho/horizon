@@ -14,65 +14,25 @@
 <div class="flex flex-col gap-6 mb-8">
   <div class="flex items-center justify-between border-b border-base-200">
     <div class="tabs tabs-bordered">
-      <%= link_to goals_path(request.query_parameters.merge(tab: 'active')), 
+      <%= link_to goals_path(request.query_parameters.merge(tab: 'active')),
                   class: "tab #{params[:tab] != 'archived' ? 'tab-active text-primary font-bold' : 'text-base-content/60 font-medium'}" do %>
         Active Goals (<%= current_user.goals.active.count %>)
       <% end %>
-      <%= link_to goals_path(request.query_parameters.merge(tab: 'archived')), 
+      <%= link_to goals_path(request.query_parameters.merge(tab: 'archived')),
                   class: "tab #{params[:tab] == 'archived' ? 'tab-active text-primary font-bold' : 'text-base-content/60 font-medium'}" do %>
         Archived (<%= current_user.goals.archived.count %>)
       <% end %>
     </div>
   </div>
 
-  <%= form_with url: goals_path, method: :get, class: "flex flex-wrap items-center gap-4" do |f| %>
-    <%= f.hidden_field :tab, value: params[:tab] %>
-    
-    <div class="form-control">
-      <div class="input-group">
-        <span class="bg-base-100 border-r-0 border-base-200 px-3 flex items-center">
-          <span class="material-symbols-outlined text-primary text-[20px]">category</span>
-        </span>
-        <%= f.select :category, 
-                     Goal.categories.keys.map { |c| [c.titleize, c] }, 
-                     { include_blank: "All Categories", selected: params[:category] },
-                     { name: "category", class: "select select-bordered select-sm focus:outline-none", onchange: "this.form.submit()" } %>
-      </div>
-    </div>
-
-    <div class="form-control">
-      <div class="input-group">
-        <span class="bg-base-100 border-r-0 border-base-200 px-3 flex items-center">
-          <span class="material-symbols-outlined text-primary text-[20px]">sort</span>
-        </span>
-        <%= f.select :sort, 
-                     [
-                       ["Deadline: Soonest", "deadline_soon"],
-                       ["Deadline: Furthest", "deadline_far"],
-                       ["Progress: High to Low", "progress_high"],
-                       ["Progress: Low to High", "progress_low"]
-                     ], 
-                     { selected: params[:sort] || "deadline_soon" },
-                     { name: "sort", class: "select select-bordered select-sm focus:outline-none", onchange: "this.form.submit()" } %>
-      </div>
-    </div>
-
-    <%= f.button type: :submit, name: nil, class: "btn btn-sm btn-primary btn-square", id: "apply-filters" do %>
-      <span class="material-symbols-outlined">filter_list</span>
-    <% end %>
-
-    <% if params[:category].present? || params[:sort].present? %>
-      <%= link_to goals_path(tab: params[:tab]), class: "btn btn-sm btn-ghost text-error gap-1" do %>
-        <span class="material-symbols-outlined text-[18px]">close</span>
-        Clear
-      <% end %>
-    <% end %>
-  <% end %>
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <%= render "filters" %>
+  </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   <% @goals.each do |goal| %>
-    <% 
+    <%
       status_color = case goal.status
                      when 'on_track' then 'text-success bg-success/10'
                      when 'behind' then 'text-warning bg-warning/10'
@@ -80,7 +40,7 @@
                      when 'at_risk' then 'text-error bg-error/10'
                      else 'text-base-content/70 bg-base-content/10'
                      end
-                     
+
       progress_color = case goal.status
                        when 'on_track' then 'progress-success'
                        when 'behind' then 'progress-warning'
@@ -89,7 +49,7 @@
                        else 'progress-primary'
                        end
     %>
-    
+
     <div class="card bg-base-100 border border-base-200 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all group rounded-xl">
       <div class="card-body p-5 flex flex-col h-full">
         <div class="flex justify-between items-start mb-4">
