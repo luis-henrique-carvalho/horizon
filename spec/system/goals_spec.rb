@@ -10,7 +10,7 @@ RSpec.describe "Goals", type: :system do
 
   it "allows a user to create a new goal" do
     visit goals_path
-    
+
     expect(page).to have_content("My Goals")
     click_on "Create New Goal"
 
@@ -28,10 +28,10 @@ RSpec.describe "Goals", type: :system do
 
   it "allows a user to view, edit and delete their goal" do
     goal = create(:goal, user: user, title: "Original Goal")
-    
+
     visit goals_path
     expect(page).to have_content("Original Goal")
-    
+
     # View details
     click_on "View Details"
     expect(page).to have_content("Original Goal")
@@ -39,7 +39,7 @@ RSpec.describe "Goals", type: :system do
 
     # Edit
     visit edit_goal_path(goal)
-    
+
     fill_in "Goal Title", with: "Updated Goal"
     click_on "Save Goal"
 
@@ -51,5 +51,23 @@ RSpec.describe "Goals", type: :system do
     click_on "Delete"
     expect(page).to have_content("Goal was successfully destroyed.")
     expect(page).not_to have_content("Updated Goal")
+  end
+
+  it "displays milestones and subtasks with clear hierarchy" do
+    goal = create(:goal, user: user)
+    milestone = create(:milestone, goal: goal, title: "Design Phase")
+    create(:subtask, milestone: milestone, title: "Wireframes")
+
+    visit edit_goal_path(goal)
+
+    expect(page).to have_selector(".milestone-card")
+    within ".milestone-card" do
+      expect(page).to have_field(with: "Design Phase")
+      expect(page).to have_selector(".subtask-section")
+
+      within ".subtask-section" do
+        expect(page).to have_field(with: "Wireframes")
+      end
+    end
   end
 end

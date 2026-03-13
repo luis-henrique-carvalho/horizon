@@ -1,40 +1,47 @@
-<div class="nested-fields p-4 bg-base-200/30 border border-base-300 rounded-xl" data-new-record="<%= f.object.new_record? %>">
-  <div class="flex items-center gap-3 mb-4">
+<div class="nested-fields milestone-card mb-6 overflow-hidden bg-base-100 border border-base-300 rounded-2xl shadow-sm hover:shadow-md transition-all" data-new-record="<%= f.object.new_record? %>">
+  <!-- Milestone Header -->
+  <div class="p-4 bg-base-200/50 border-b border-base-200 flex items-center gap-3">
     <div class="text-primary/60 cursor-move">
       <span class="material-symbols-outlined text-base">drag_indicator</span>
     </div>
-    
+
     <%= f.hidden_field :_destroy %>
     <%= f.hidden_field :order, value: f.object.order || 0 %>
-    
-    <div class="flex-1">
-      <%= f.text_field :title, placeholder: "Milestone Title", class: "input input-ghost w-full p-0 h-auto min-h-0 text-sm font-bold text-base-content focus:bg-transparent border-none focus:outline-none focus:ring-0" %>
+
+    <div class="flex-1 p-2">
+      <div class="flex flex-col p-2">
+        <span class="text-[10px] font-bold text-primary uppercase tracking-widest mb-0.5">Milestone</span>
+        <%= f.text_field :title, placeholder: "Milestone Title", class: "input input-ghost w-full p-0 h-auto min-h-0 text-base font-bold text-base-content focus:bg-transparent border-none focus:outline-none focus:ring-0" %>
+      </div>
     </div>
-    
-    <button type="button" data-action="nested-form#remove" class="btn btn-ghost btn-xs text-base-content/40 hover:text-error transition-colors">
+
+    <button type="button" data-action="nested-form#remove" class="btn btn-ghost btn-sm btn-circle text-base-content/40 hover:text-error transition-colors">
       <span class="material-symbols-outlined text-sm">delete</span>
     </button>
   </div>
 
   <!-- Subtasks Section -->
-  <div data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-fields" class="pl-7 space-y-2">
-    <div class="flex items-center justify-between mb-2">
-      <h4 class="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Subtasks</h4>
-      <button type="button" data-action="nested-form#add" class="btn btn-ghost btn-xs h-6 min-h-0 text-primary hover:bg-primary/5">
-        <span class="material-symbols-outlined text-xs">add</span>
-      </button>
-    </div>
+  <div data-controller="nested-form" data-nested-form-wrapper-selector-value=".nested-fields" class="p-4 pt-2">
+    <div class="subtask-section ml-4 pl-6 border-l-2 border-primary/10">
+      <div class="flex items-center justify-between p-2 mb-2">
+        <h4 class="text-[10px] font-bold text-base-content/40 uppercase tracking-widest">Subtasks</h4>
+        <button type="button" data-action="nested-form#add" class="btn btn-ghost btn-xs h-6 min-h-0 text-primary hover:bg-primary/5 gap-1">
+          <span class="material-symbols-outlined text-xs">add</span>
+          <span class="text-[10px]">Add Subtask</span>
+        </button>
+      </div>
 
-    <div data-nested-form-target="container" class="space-y-2">
-      <%= f.fields_for :subtasks do |s_form| %>
-        <%= render "subtask_fields", f: s_form %>
-      <% end %>
-    </div>
+      <div data-nested-form-target="container" class="space-y-3">
+        <%= f.fields_for :subtasks do |s_form| %>
+          <%= render "subtask_fields", f: s_form %>
+        <% end %>
+      </div>
 
-    <template data-nested-form-target="template">
-      <%= f.fields_for :subtasks, Subtask.new, child_index: "NEW_RECORD" do |s_form| %>
-        <%= render "subtask_fields", f: s_form %>
-      <% end %>
-    </template>
+      <template data-nested-form-target="template">
+        <%= f.fields_for :subtasks, Subtask.new, child_index: "NEW_RECORD" do |s_form| %>
+          <%= render "subtask_fields", f: s_form %>
+        <% end %>
+      </template>
+    </div>
   </div>
 </div>
