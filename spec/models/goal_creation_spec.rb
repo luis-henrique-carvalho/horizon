@@ -21,7 +21,7 @@ RSpec.describe "Goal creation with nested attributes", type: :model do
     }
 
     expect { Goal.create!(params) }.not_to raise_error
-    
+
     goal = Goal.last
     expect(goal.progress).to eq(0)
   end
