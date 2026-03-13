@@ -1,24 +1,24 @@
 <div class="mb-8">
-  <div class="text-sm breadcrumbs">
+  <div class="text-sm breadcrumbs text-base-content/60">
     <ul>
-      <li><%= link_to "Home", root_path %></li>
-      <li><%= link_to "Goals", goals_path %></li>
-      <li><%= @goal.title %></li>
+      <li><%= link_to "Home", root_path, class: "hover:text-primary transition-colors" %></li>
+      <li><%= link_to "Goals", goals_path, class: "hover:text-primary transition-colors" %></li>
+      <li class="font-bold text-base-content"><%= @goal.title %></li>
     </ul>
   </div>
 
-  <div class="flex justify-between items-end gap-6 mt-4">
+  <div class="flex flex-wrap justify-between items-end gap-6 mt-4">
     <div>
-      <h1 class="text-3xl font-bold"><%= @goal.title %></h1>
+      <h1 class="text-3xl font-black tracking-tight"><%= @goal.title %></h1>
       <div class="flex items-center gap-3 mt-2">
-        <span class="badge badge-primary badge-outline font-bold uppercase"><%= @goal.category.titleize %></span>
-        <span class="badge font-bold uppercase 
+        <span class="text-[10px] uppercase tracking-widest text-primary font-bold"><%= @goal.category.titleize %></span>
+        <span class="px-2 py-1 text-[11px] font-bold rounded uppercase 
           <%= case @goal.status
-              when 'on_track' then 'badge-success'
-              when 'behind' then 'badge-warning'
-              when 'completed' then 'badge-info'
-              when 'at_risk' then 'badge-error'
-              else 'badge-ghost'
+              when 'on_track' then 'text-success bg-success/10'
+              when 'behind' then 'text-warning bg-warning/10'
+              when 'completed' then 'text-info bg-info/10'
+              when 'at_risk' then 'text-error bg-error/10'
+              else 'text-base-content/70 bg-base-content/10'
               end
           %>">
           <%= @goal.status.titleize %>
@@ -27,23 +27,29 @@
     </div>
     
     <div class="flex gap-2">
-      <%= link_to "Edit Goal", edit_goal_path(@goal), class: "btn btn-outline" %>
-      <%= button_to "Delete", goal_path(@goal), method: :delete, form_class: "inline", class: "btn btn-error" %>
+      <%= link_to edit_goal_path(@goal), class: "btn btn-outline hover:bg-base-200 hover:text-base-content border-base-300 gap-2 font-bold" do %>
+        <span class="material-symbols-outlined text-[18px]">edit</span>
+        Edit Goal
+      <% end %>
+      <%= button_to goal_path(@goal), method: :delete, form_class: "inline", class: "btn btn-outline hover:bg-error hover:text-white border-base-300 hover:border-error gap-2 font-bold" do %>
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+        Delete
+      <% end %>
     </div>
   </div>
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
   <div class="md:col-span-2">
-    <div class="card bg-base-100 shadow-xl border border-base-200">
-      <div class="card-body">
-        <h2 class="card-title text-xl mb-4">Description</h2>
+    <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
+      <div class="card-body p-6">
+        <h2 class="card-title text-xl mb-4 font-black">Description</h2>
         
-        <div class="prose max-w-none">
+        <div class="prose max-w-none text-base-content/80">
           <% if @goal.description.present? %>
             <%= simple_format @goal.description %>
           <% else %>
-            <p class="text-base-content/60 italic">No description provided.</p>
+            <p class="text-base-content/50 italic">No description provided for this objective.</p>
           <% end %>
         </div>
       </div>
@@ -51,14 +57,17 @@
   </div>
   
   <div class="md:col-span-1 flex flex-col gap-6">
-    <div class="card bg-base-100 shadow-xl border border-base-200">
-      <div class="card-body">
-        <h2 class="card-title text-xl mb-4">Progress</h2>
+    <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
+      <div class="card-body p-6">
+        <h2 class="card-title text-xl mb-4 font-black flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">trending_up</span>
+          Progress
+        </h2>
         <div class="flex justify-between items-end mb-2">
-          <span class="text-sm text-base-content/60">Current</span>
+          <span class="text-sm text-base-content/60 font-medium">Tracking</span>
           <span class="text-2xl font-bold"><%= @goal.progress %>%</span>
         </div>
-        <progress class="progress w-full h-4
+        <progress class="progress w-full h-3
           <%= case @goal.status
               when 'on_track' then 'progress-success'
               when 'behind' then 'progress-warning'
@@ -70,27 +79,32 @@
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow-xl border border-base-200">
-      <div class="card-body">
-        <h2 class="card-title text-xl mb-4">Details</h2>
+    <div class="card bg-base-100 shadow-sm hover:shadow-xl transition-all border border-base-200 rounded-xl">
+      <div class="card-body p-6">
+        <h2 class="card-title text-xl mb-4 font-black flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-[24px]">info</span>
+          Details
+        </h2>
         
         <div class="flex flex-col gap-4">
           <div>
-            <span class="text-xs text-base-content/60 uppercase block mb-1">Status</span>
-            <span class="font-medium"><%= @goal.status.titleize %></span>
+            <span class="text-[10px] text-base-content/50 uppercase font-bold block mb-1">Status</span>
+            <span class="font-medium inline-flex items-center gap-2">
+               <%= @goal.status.titleize %>
+            </span>
           </div>
-          <div class="divider my-0"></div>
+          <div class="h-[1px] w-full bg-base-200"></div>
           <div>
-            <span class="text-xs text-base-content/60 uppercase block mb-1">Target Date</span>
+            <span class="text-[10px] text-base-content/50 uppercase font-bold block mb-1">Target Date</span>
             <span class="font-medium"><%= @goal.deadline&.strftime("%B %d, %Y") || "No date set" %></span>
           </div>
-          <div class="divider my-0"></div>
+          <div class="h-[1px] w-full bg-base-200"></div>
           <div>
-            <span class="text-xs text-base-content/60 uppercase block mb-1">Owner</span>
-            <div class="flex items-center gap-2 mt-1">
-              <div class="avatar placeholder">
-                <div class="bg-primary text-primary-content rounded-full w-8">
-                  <span class="text-xs"><%= @goal.user.email[0..1].upcase %></span>
+            <span class="text-[10px] text-base-content/50 uppercase font-bold block mb-1">Owner</span>
+            <div class="flex items-center gap-3 mt-1">
+              <div class="avatar">
+                <div class="w-8 rounded-full border border-base-200">
+                  <img src="https://ui-avatars.com/api/?name=<%= @goal.user.email.first(2).upcase %>&background=random" />
                 </div>
               </div>
               <span class="font-medium text-sm"><%= @goal.user.email %></span>

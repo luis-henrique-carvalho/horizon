@@ -19,7 +19,7 @@ RSpec.describe "Goals", type: :system do
     select "On Track", from: "Status"
     fill_in "Progress", with: "50"
     fill_in "Description", with: "Testing the flow"
-    click_on "Create Goal"
+    click_on "Save Goal"
 
     expect(page).to have_content("Goal was successfully created.")
     expect(page).to have_content("System Test Goal")
@@ -41,7 +41,7 @@ RSpec.describe "Goals", type: :system do
     click_on "Edit Goal"
     fill_in "Title", with: "Updated Goal"
     fill_in "Progress", with: "80"
-    click_on "Update Goal"
+    click_on "Save Goal"
 
     expect(page).to have_content("Goal was successfully updated.")
     expect(page).to have_content("Updated Goal")
